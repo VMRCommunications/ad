@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="ad.size" content="width=300,height=250">
+    <title>Subscribe - Light & Truth</title>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #ad-container {
+            width: 300px; height: 250px; position: relative; overflow: hidden;
+            border: 1px solid #000000; box-sizing: border-box;
+            background-color: #000000; color: #ffffff;
+            text-align: center; padding: 12px 15px 0 15px;
+        }
+        h2 { font-size: 16px; margin: 0 0 2px 0; font-weight: 600; }
+        .subtitle { font-size: 11px; color: #cccccc; margin: 0 0 10px 0; }
+        .form-group { margin-bottom: 8px; }
+        input[type="text"], input[type="email"] {
+            width: 100%; padding: 6px; box-sizing: border-box; border: 1px solid #ffffff;
+            border-radius: 2px; font-size: 12px; background: #ffffff; color: #000000;
+        }
+        .checkbox-container { display: flex; align-items: flex-start; text-align: left; margin-bottom: 10px; }
+        .checkbox-container input[type="checkbox"] { margin: 2px 6px 0 0; cursor: pointer; }
+        .checkbox-container label { font-size: 9px; color: #aaaaaa; line-height: 1.2; cursor: pointer; }
+        .action-btn {
+            background-color: #d1ab66; color: #000000; border: none; padding: 8px 0;
+            width: 100%; font-weight: bold; font-size: 13px; cursor: pointer;
+            border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; transition: background-color 0.2s; margin-bottom: 6px;
+        }
+        .action-btn:hover { background-color: #e5be7a; }
+        .privacy-link { font-size: 9px; color: #d1ab66; text-decoration: none; }
+        .privacy-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div id="ad-container">
+        <h2>Light & Truth</h2>
+        <p class="subtitle">Reflections on Education and Culture</p>
+        
+        <div class="form-group">
+            <input type="text" id="name-input" placeholder="First Name" required>
+        </div>
+        <div class="form-group">
+            <input type="email" id="email-input" placeholder="Email Address" required>
+        </div>
+        <div class="checkbox-container">
+            <input type="checkbox" id="subscribe-check" checked>
+            <label for="subscribe-check">Subscribe? Your info won't be sold, and you can opt out any time.</label>
+        </div>
+        
+        <button id="submit-btn" class="action-btn">Subscribe</button>
+        <a href="YOUR_PRIVACY_POLICY_URL_HERE" target="_blank" class="privacy-link">Privacy Policy</a>
+    </div>
+
+    <script>
+        // --- PASTE YOUR GOOGLE DEPLOYMENT URL BELOW ---
+        const GOOGLE_SCRIPT_URL = 'YOUR_WEB_APP_URL_HERE';
+
+        const submitBtn = document.getElementById('submit-btn');
+        const nameInput = document.getElementById('name-input');
+        const emailInput = document.getElementById('email-input');
+        const subscribeCheck = document.getElementById('subscribe-check');
+
+        // Auto-focus the first name field
+        window.onload = () => { setTimeout(() => { nameInput.focus(); }, 100); };
+
+        submitBtn.addEventListener('click', function() {
+            const nameValue = nameInput.value.trim();
+            const emailValue = emailInput.value.trim();
+            const subscribeValue = subscribeCheck.checked ? 'Yes' : 'No';
+            const dateString = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString();
+            
+            if (nameValue !== '' && emailValue !== '' && emailValue.includes('@') && emailValue.includes('.')) {
+                
+                // Show it's working
+                submitBtn.innerText = "Submitting...";
+                submitBtn.style.backgroundColor = "#e5be7a";
+                submitBtn.disabled = true;
+
+                const urlEncodedData = new URLSearchParams();
+                urlEncodedData.append('name', nameValue);
+                urlEncodedData.append('email', emailValue);
+                urlEncodedData.append('date', dateString);
+                urlEncodedData.append('subscribe', subscribeValue);
+
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: urlEncodedData
+                })
+                .then(() => {
+                    // Small delay before redirecting
+                    setTimeout(() => {
+                        window.location.href = 'frame3.html';
+                    }, 400);
+                })
+                .catch(error => console.error('Error:', error));
+
+            } else {
+                if(nameValue === '') nameInput.style.border = '2px solid red';
+                if(emailValue === '' || !emailValue.includes('@')) emailInput.style.border = '2px solid red';
+            }
+        });
+
+        nameInput.addEventListener('input', () => nameInput.style.border = '1px solid #ffffff');
+        emailInput.addEventListener('input', () => emailInput.style.border = '1px solid #ffffff');
+    </script>
+</body>
+</html>
