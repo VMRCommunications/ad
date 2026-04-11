@@ -1,169 +1,819 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=300,height=600">
-<title>Magisterium AI Ad</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=300,height=600,initial-scale=1.0" />
+  <title>Magisterium AI 300x600 Ad</title>
+  <style>
+    * { box-sizing: border-box; }
 
-<style>
-body {
-  margin:0;
-  background:#000;
-  color:#fff;
-  font-family:Arial;
-}
-
-.ad {
-  width:300px;
-  height:600px;
-  padding:10px;
-}
-
-#gate {
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-}
-
-.gate-inner {
-  text-align:center;
-}
-
-input {
-  padding:10px;
-  margin-top:10px;
-  width:180px;
-}
-
-button {
-  margin-top:10px;
-  padding:10px;
-  background:#f5c85b;
-  border:none;
-}
-
-.messages {
-  height:350px;
-  overflow:auto;
-  margin-top:10px;
-}
-
-.bubble {
-  margin:6px 0;
-  padding:8px;
-  border-radius:8px;
-}
-
-.bot { background:#222; }
-.user { background:#f5c85b; color:#000; }
-
-textarea {
-  width:100%;
-  height:40px;
-}
-</style>
-</head>
-
-<body>
-
-<!-- PASSCODE GATE -->
-<div id="gate">
-  <div class="gate-inner">
-    <h3>Enter Passcode</h3>
-    <input id="passcodeInput" type="password">
-    <button onclick="unlock()">Unlock</button>
-    <p id="error"></p>
-  </div>
-</div>
-
-<div class="ad">
-
-<h2>Ask a Catholic AI question</h2>
-
-<div class="messages" id="messages"></div>
-
-<form id="form">
-<textarea id="input"></textarea>
-<button>Send</button>
-</form>
-
-</div>
-
-<script>
-const API = "https://magai-ad-1.vmr.workers.dev";
-let PASSCODE = null;
-
-function unlock() {
-  const val = document.getElementById("passcodeInput").value;
-
-  fetch(API, {
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "x-passcode": val
-    },
-    body:JSON.stringify({
-      messages:[{role:"user",content:"test"}]
-    })
-  }).then(res=>{
-    if(res.status === 401){
-      document.getElementById("error").innerText = "Wrong passcode";
-    } else {
-      PASSCODE = val;
-      sessionStorage.setItem("passcode", val);
-      document.getElementById("gate").style.display="none";
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 300px;
+      height: 600px;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #000;
     }
-  });
-}
 
-if(sessionStorage.getItem("passcode")){
-  PASSCODE = sessionStorage.getItem("passcode");
-  document.addEventListener("DOMContentLoaded",()=>{
-    document.getElementById("gate").style.display="none";
-  });
-}
+    body {
+      position: relative;
+    }
 
-function add(role,text){
-  const div=document.createElement("div");
-  div.className="bubble "+role;
-  div.innerHTML=text;
-  document.getElementById("messages").appendChild(div);
-}
+    .ad {
+      width: 300px;
+      height: 600px;
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      background:
+        radial-gradient(circle at 85% 12%, rgba(212,164,55,.14), transparent 20%),
+        linear-gradient(180deg, #000 0%, #050505 100%);
+      border: 1px solid #1e1e1e;
+    }
 
-async function send(msg){
-  add("user",msg);
+    .header {
+      padding: 10px 12px 8px;
+    }
 
-  const res = await fetch(API,{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "x-passcode": PASSCODE
-    },
-    body:JSON.stringify({
-      messages:[{role:"user",content:msg}]
-    })
-  });
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
 
-  const data = await res.json();
+    .brand-wrap {
+      background: #000;
+      padding: 2px 0;
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
 
-  let answer = data.answer || "No response";
+    .brand-logo {
+      display: block;
+      width: 138px;
+      height: auto;
+      max-height: 30px;
+      object-fit: contain;
+      background: #000;
+    }
 
-  answer += "<br><br>👉 <a href='https://www.magisterium.com/' target='_blank'>Click here for the full experience</a>";
+    .sponsor {
+      font-size: 10px;
+      color: #9a9a9a;
+      white-space: nowrap;
+    }
 
-  add("bot",answer);
-}
+    .headline {
+      margin: 0 0 4px;
+      font-size: 20px;
+      line-height: 1.05;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
 
-document.getElementById("form").addEventListener("submit",e=>{
-  e.preventDefault();
-  const val=document.getElementById("input").value;
-  document.getElementById("input").value="";
-  send(val);
-});
-</script>
+    .subhead {
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.35;
+      color: #c8c8c8;
+    }
 
+    .prompt-marquee {
+      height: 52px;
+      overflow: hidden;
+      margin: 6px 0 8px;
+      position: relative;
+      mask-image: linear-gradient(to right, transparent 0, black 8%, black 92%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0, black 8%, black 92%, transparent 100%);
+    }
+
+    .marquee-row {
+      display: flex;
+      width: max-content;
+      gap: 6px;
+      margin-bottom: 6px;
+      will-change: transform;
+    }
+
+    .marquee-row.row-1 {
+      animation: scrollLeft 32s linear infinite;
+    }
+
+    .marquee-row.row-2 {
+      animation: scrollRight 28s linear infinite;
+    }
+
+    .prompt-marquee:hover .marquee-row {
+      animation-play-state: paused;
+    }
+
+    .marquee-pill {
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid #2f2f2f;
+      background: #0d0d0d;
+      color: #d8d8d8;
+      font-size: 9px;
+      line-height: 1;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      transition: background .15s ease, border-color .15s ease, color .15s ease, transform .15s ease;
+    }
+
+    .marquee-pill:hover {
+      background: #151515;
+      border-color: #4a4a4a;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    @keyframes scrollLeft {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    @keyframes scrollRight {
+      0% { transform: translateX(-50%); }
+      100% { transform: translateX(0); }
+    }
+
+    .chat-shell {
+      margin: 0 8px;
+      height: 420px;
+      border-radius: 14px;
+      background: #0b0b0b;
+      border: 1px solid #232323;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 26px rgba(0,0,0,.4);
+    }
+
+    .chat-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      border-bottom: 1px solid #1f1f1f;
+      background: #090909;
+      min-height: 48px;
+    }
+
+    .chat-title {
+      min-width: 0;
+    }
+
+    .chat-title strong {
+      display: block;
+      font-size: 12px;
+      line-height: 1.1;
+      color: #fff;
+    }
+
+    .chat-title span {
+      display: block;
+      font-size: 10px;
+      color: #9f9f9f;
+      line-height: 1.2;
+      margin-top: 2px;
+    }
+
+    .status {
+      font-size: 10px;
+      color: #f5c85b;
+      background: rgba(245,200,91,.08);
+      border: 1px solid rgba(245,200,91,.2);
+      padding: 4px 7px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      scroll-behavior: smooth;
+    }
+
+    .messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .messages::-webkit-scrollbar-thumb {
+      background: #2a2a2a;
+      border-radius: 999px;
+    }
+
+    .bubble {
+      max-width: 88%;
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      line-height: 1.35;
+      word-wrap: break-word;
+    }
+
+    .bot {
+      align-self: flex-start;
+      background: #171717;
+      border: 1px solid #2b2b2b;
+      color: #fff;
+      border-top-left-radius: 6px;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #f5c85b, #d4a437);
+      color: #000;
+      font-weight: 600;
+      border-top-right-radius: 6px;
+    }
+
+    .bubble strong {
+      font-weight: 700;
+    }
+
+    .bubble em {
+      font-style: italic;
+    }
+
+    .bubble a {
+      color: #f5c85b;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    .suggestions {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 0 8px 8px;
+      border-top: 1px solid #141414;
+      background: #0b0b0b;
+    }
+
+    .suggestions::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chip {
+      flex: 0 0 auto;
+      padding: 7px 9px;
+      border-radius: 999px;
+      border: 1px solid #333;
+      background: #111;
+      color: #fff;
+      font-size: 9px;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      transition: background .15s ease, border-color .15s ease;
+    }
+
+    .chip:hover {
+      background: #181818;
+      border-color: #4a4a4a;
+    }
+
+    .composer {
+      display: grid;
+      grid-template-columns: 1fr 38px;
+      gap: 6px;
+      padding: 8px;
+      border-top: 1px solid #202020;
+      background: #090909;
+    }
+
+    .composer textarea {
+      width: 100%;
+      height: 36px;
+      resize: none;
+      border-radius: 10px;
+      border: 1px solid #333;
+      background: #101010;
+      color: #fff;
+      font-size: 11px;
+      line-height: 1.25;
+      padding: 8px;
+      outline: none;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .composer textarea::placeholder {
+      color: #8d8d8d;
+    }
+
+    .send-btn {
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f5c85b, #d4a437);
+      color: #000;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .send-btn:disabled {
+      opacity: .85;
+      cursor: default;
+    }
+
+    .send-btn.loading {
+      color: transparent;
+    }
+
+    .send-btn.loading::before,
+    .send-btn.loading::after,
+    .send-btn.loading span::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 5px;
+      height: 5px;
+      margin-top: -2.5px;
+      border-radius: 50%;
+      background: #000;
+      animation: thinkingPulse 1s infinite ease-in-out;
+    }
+
+    .send-btn.loading::before {
+      left: 11px;
+      animation-delay: 0s;
+    }
+
+    .send-btn.loading span::before {
+      left: 16px;
+      animation-delay: .15s;
+    }
+
+    .send-btn.loading::after {
+      left: 21px;
+      animation-delay: .3s;
+    }
+
+    @keyframes thinkingPulse {
+      0%, 80%, 100% {
+        transform: scale(.7);
+        opacity: .35;
+      }
+      40% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .typing {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      min-width: 30px;
+    }
+
+    .typing span {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #fff;
+      animation: dotPulse 1s infinite ease-in-out;
+    }
+
+    .typing span:nth-child(2) { animation-delay: .15s; }
+    .typing span:nth-child(3) { animation-delay: .3s; }
+
+    @keyframes dotPulse {
+      0%, 80%, 100% {
+        transform: scale(.7);
+        opacity: .35;
+      }
+      40% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .footer {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      padding: 0 10px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 999px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .legal {
+      font-size: 8px;
+      color: #777;
+      text-align: right;
+      line-height: 1.2;
+      max-width: 104px;
+    }
+
+    #gate {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.96);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .gate-inner {
+      width: 240px;
+      padding: 18px 16px;
+      border: 1px solid #2a2a2a;
+      border-radius: 14px;
+      background: #0b0b0b;
+      text-align: center;
+      box-shadow: 0 10px 24px rgba(0,0,0,.45);
+    }
+
+    .gate-logo {
+      display: block;
+      width: 140px;
+      max-height: 32px;
+      object-fit: contain;
+      margin: 0 auto 12px;
+    }
+
+    .gate-title {
+      margin: 0 0 6px;
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .gate-copy {
+      margin: 0 0 12px;
+      font-size: 11px;
+      line-height: 1.35;
+      color: #bcbcbc;
+    }
+
+    .gate-input {
+      width: 100%;
+      height: 38px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      background: #101010;
+      color: #fff;
+      font-size: 12px;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    .gate-button {
+      width: 100%;
+      height: 38px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f5c85b, #d4a437);
+      color: #000;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .gate-error {
+      min-height: 16px;
+      margin: 10px 0 0;
+      font-size: 11px;
+      color: #ff7b7b;
+    }
+  </style>
+</head>
+<body>
+  <div class="ad">
+    <div id="gate">
+      <div class="gate-inner">
+        <img
+          class="gate-logo"
+          src="https://iili.io/BVD1wMP.md.png"
+          alt="Magisterium AI"
+        />
+        <h2 class="gate-title">Enter Passcode</h2>
+        <p class="gate-copy">This preview is protected. Enter the passcode to continue.</p>
+        <input id="passcodeInput" class="gate-input" type="password" placeholder="Enter passcode" />
+        <button id="gateButton" class="gate-button" type="button">Unlock</button>
+        <p id="gateError" class="gate-error"></p>
+      </div>
+    </div>
+
+    <div class="header">
+      <div class="brand-row">
+        <div class="brand-wrap">
+          <img
+            class="brand-logo"
+            src="https://iili.io/BVD1wMP.md.png"
+            alt="Magisterium AI"
+          />
+        </div>
+        <div class="sponsor">Sponsored</div>
+      </div>
+
+      <h1 class="headline">Ask a Catholic AI question</h1>
+      <p class="subhead">Get instant, faithful answers inside the ad.</p>
+
+      <div class="prompt-marquee" id="marquee">
+        <div class="marquee-row row-1">
+          <div class="marquee-pill" data-prompt="What is the Magisterium?">What is the Magisterium?</div>
+          <div class="marquee-pill" data-prompt="Explain Lent simply.">Explain Lent simply</div>
+          <div class="marquee-pill" data-prompt="What is a good prayer before work?">Prayer before work</div>
+          <div class="marquee-pill" data-prompt="What is confession?">What is confession?</div>
+          <div class="marquee-pill" data-prompt="What is mortal sin?">What is mortal sin?</div>
+          <div class="marquee-pill" data-prompt="How do I pray the Rosary?">How do I pray the Rosary?</div>
+          <div class="marquee-pill" data-prompt="What is the Eucharist?">What is the Eucharist?</div>
+
+          <div class="marquee-pill" data-prompt="What is the Magisterium?">What is the Magisterium?</div>
+          <div class="marquee-pill" data-prompt="Explain Lent simply.">Explain Lent simply</div>
+          <div class="marquee-pill" data-prompt="What is a good prayer before work?">Prayer before work</div>
+          <div class="marquee-pill" data-prompt="What is confession?">What is confession?</div>
+          <div class="marquee-pill" data-prompt="What is mortal sin?">What is mortal sin?</div>
+          <div class="marquee-pill" data-prompt="How do I pray the Rosary?">How do I pray the Rosary?</div>
+          <div class="marquee-pill" data-prompt="What is the Eucharist?">What is the Eucharist?</div>
+        </div>
+
+        <div class="marquee-row row-2">
+          <div class="marquee-pill" data-prompt="Can Catholics support IVF?">Can Catholics support IVF?</div>
+          <div class="marquee-pill" data-prompt="Why do Catholics honor Mary?">Why do Catholics honor Mary?</div>
+          <div class="marquee-pill" data-prompt="What does the Church teach?">What does the Church teach?</div>
+          <div class="marquee-pill" data-prompt="What is a novena?">What is a novena?</div>
+          <div class="marquee-pill" data-prompt="Is the death penalty allowed?">Is the death penalty allowed?</div>
+          <div class="marquee-pill" data-prompt="What is the difference between sin and temptation?">Sin vs temptation</div>
+
+          <div class="marquee-pill" data-prompt="Can Catholics support IVF?">Can Catholics support IVF?</div>
+          <div class="marquee-pill" data-prompt="Why do Catholics honor Mary?">Why do Catholics honor Mary?</div>
+          <div class="marquee-pill" data-prompt="What does the Church teach?">What does the Church teach?</div>
+          <div class="marquee-pill" data-prompt="What is a novena?">What is a novena?</div>
+          <div class="marquee-pill" data-prompt="Is the death penalty allowed?">Is the death penalty allowed?</div>
+          <div class="marquee-pill" data-prompt="What is the difference between sin and temptation?">Sin vs temptation</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-shell">
+      <div class="chat-topbar">
+        <div class="chat-title">
+          <strong>Magisterium AI</strong>
+          <span>Cited Catholic answers</span>
+        </div>
+        <div class="status" id="status">Ready</div>
+      </div>
+
+      <div class="messages" id="messages"></div>
+
+      <div class="suggestions" id="suggestions">
+        <div class="chip" data-prompt="What is the Magisterium?">What is the Magisterium?</div>
+        <div class="chip" data-prompt="Explain Lent simply.">Explain Lent</div>
+        <div class="chip" data-prompt="What is a good prayer before work?">Prayer before work</div>
+      </div>
+
+      <form class="composer" id="form">
+        <textarea id="input" placeholder="Ask a faith question…"></textarea>
+        <button class="send-btn" id="sendBtn" type="submit"><span>➤</span></button>
+      </form>
+    </div>
+
+    <div class="footer">
+      <a class="cta" href="https://www.magisterium.com/" target="_blank" rel="noopener noreferrer">Open Full Experience</a>
+      <div class="legal">Faithfully cited answers</div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'https://magai-ad-1.vmr.workers.dev';
+
+    const messagesEl = document.getElementById('messages');
+    const input = document.getElementById('input');
+    const form = document.getElementById('form');
+    const statusEl = document.getElementById('status');
+    const sendBtn = document.getElementById('sendBtn');
+    const suggestions = document.getElementById('suggestions');
+    const marquee = document.getElementById('marquee');
+    const gate = document.getElementById('gate');
+    const gateButton = document.getElementById('gateButton');
+    const gateError = document.getElementById('gateError');
+    const passcodeInput = document.getElementById('passcodeInput');
+
+    let passcode = sessionStorage.getItem('magai_passcode') || '';
+
+    function formatText(text) {
+      if (!text) return '';
+
+      let safe = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      safe = safe.replace(
+        /&lt;a href='(.*?)' target='_blank'&gt;(.*?)&lt;\/a&gt;/g,
+        "<a href='$1' target='_blank' rel='noopener noreferrer'>$2</a>"
+      );
+
+      safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      safe = safe.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      safe = safe.replace(/\n\n/g, '<br><br>');
+      safe = safe.replace(/\n/g, '<br>');
+
+      return safe;
+    }
+
+    function addBubble(role, text, isTyping = false) {
+      const div = document.createElement('div');
+      div.className = 'bubble ' + (role === 'user' ? 'user' : 'bot');
+
+      if (isTyping) {
+        div.innerHTML = '<span class="typing"><span></span><span></span><span></span></span>';
+      } else {
+        div.innerHTML = formatText(text);
+      }
+
+      messagesEl.appendChild(div);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      return div;
+    }
+
+    function setBusy(isBusy) {
+      if (isBusy) {
+        statusEl.textContent = 'Thinking';
+        sendBtn.disabled = true;
+        sendBtn.classList.add('loading');
+        input.disabled = true;
+      } else {
+        statusEl.textContent = 'Ready';
+        sendBtn.disabled = false;
+        sendBtn.classList.remove('loading');
+        input.disabled = false;
+      }
+    }
+
+    async function verifyPasscode(candidate) {
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-passcode': candidate
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: 'user',
+              content: 'test'
+            }
+          ]
+        })
+      });
+
+      return res.status !== 401;
+    }
+
+    async function unlockGate() {
+      const candidate = passcodeInput.value.trim();
+      if (!candidate) {
+        gateError.textContent = 'Please enter the passcode.';
+        return;
+      }
+
+      gateButton.disabled = true;
+      gateError.textContent = 'Checking…';
+
+      try {
+        const ok = await verifyPasscode(candidate);
+        if (!ok) {
+          gateError.textContent = 'Incorrect passcode.';
+          gateButton.disabled = false;
+          return;
+        }
+
+        passcode = candidate;
+        sessionStorage.setItem('magai_passcode', candidate);
+        gate.style.display = 'none';
+      } catch (e) {
+        gateError.textContent = 'Unable to verify passcode.';
+        gateButton.disabled = false;
+      }
+    }
+
+    async function send(promptText) {
+      const text = String(promptText || '').trim();
+      if (!text || !passcode) return;
+
+      addBubble('user', text);
+      setBusy(true);
+      const typingBubble = addBubble('assistant', '', true);
+
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-passcode': passcode
+          },
+          body: JSON.stringify({
+            messages: [
+              {
+                role: 'system',
+                content: 'You are a Catholic assistant inside a 300x600 display ad. Keep answers accurate, concise, and readable. Use short paragraphs. Use bold sparingly when helpful.'
+              },
+              {
+                role: 'user',
+                content: text
+              }
+            ]
+          })
+        });
+
+        const data = await res.json();
+        typingBubble.remove();
+
+        let answer = data.answer || 'Sorry, no response was returned.';
+        answer += "\n\n👉 <a href='https://www.magisterium.com/' target='_blank'>Click here for the full experience</a>";
+
+        addBubble('assistant', answer);
+      } catch (e) {
+        typingBubble.remove();
+        addBubble('assistant', 'Sorry, the chat is temporarily unavailable.');
+        statusEl.textContent = 'Error';
+      } finally {
+        setBusy(false);
+        input.focus();
+      }
+    }
+
+    gateButton.addEventListener('click', unlockGate);
+
+    passcodeInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        unlockGate();
+      }
+    });
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (!input.value.trim()) return;
+      const text = input.value;
+      input.value = '';
+      send(text);
+    });
+
+    suggestions.addEventListener('click', function(e) {
+      const el = e.target.closest('[data-prompt]');
+      if (!el) return;
+      send(el.getAttribute('data-prompt'));
+    });
+
+    marquee.addEventListener('click', function(e) {
+      const el = e.target.closest('[data-prompt]');
+      if (!el) return;
+      send(el.getAttribute('data-prompt'));
+    });
+
+    addBubble('assistant', 'Ask me a Catholic question.');
+
+    if (passcode) {
+      verifyPasscode(passcode)
+        .then(function(ok) {
+          if (ok) {
+            gate.style.display = 'none';
+          } else {
+            sessionStorage.removeItem('magai_passcode');
+            passcode = '';
+          }
+        })
+        .catch(function() {
+          sessionStorage.removeItem('magai_passcode');
+          passcode = '';
+        });
+    }
+  </script>
 </body>
 </html>
