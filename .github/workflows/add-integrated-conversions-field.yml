@@ -56,3 +56,5 @@ jobs:
           git add reports/multichannelreport.html
           git commit -m "Add calculated integrated conversions to CPA simulator"
           git push
+
+# retriggered
