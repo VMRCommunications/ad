@@ -1,0 +1,39 @@
+name: Normalize CatholicAdNet branding
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/normalize-catholicadnet.yml
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Replace branding references
+        shell: bash
+        run: |
+          find reports -type f -name '*.html' -print0 | xargs -0 sed -i 's/Catholic Ad Net/CatholicAdNet/g'
+          rm -f .github/workflows/normalize-catholicadnet.yml
+
+      - name: Commit updated report
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports .github/workflows/normalize-catholicadnet.yml
+          if git diff --cached --quiet; then
+            echo "No changes needed."
+          else
+            git commit -m "Change Catholic Ad Net references to CatholicAdNet"
+            git push origin HEAD:main
+          fi
