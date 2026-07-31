@@ -1,0 +1,58 @@
+name: Add integrated conversions field
+
+on:
+  push:
+    paths:
+      - .github/workflows/add-integrated-conversions-field.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Add calculated integrated conversions field
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('reports/multichannelreport.html')
+          text = path.read_text(encoding='utf-8')
+
+          old_html = '''<div class="field"><label for="baseConv">Current monthly conversions from the Facebook-only campaign</label><input id="baseConv" type="number" min="1" value="200"></div>
+<div class="field"><label for="spendLift">Additional ad spend for CatholicAdNet (%)</label>'''
+          new_html = '''<div class="field"><label for="baseConv">Current monthly conversions from the Facebook-only campaign</label><input id="baseConv" type="number" min="1" value="200"></div>
+<div class="field"><label for="integratedConv">Calculated monthly conversions from integrated approach</label><input id="integratedConv" type="number" value="256" readonly aria-readonly="true"><div class="field-note">Calculated automatically from Facebook-only conversions × the incremental conversion lift.</div></div>
+<div class="field"><label for="spendLift">Additional ad spend for CatholicAdNet (%)</label>'''
+          if old_html not in text:
+              raise SystemExit('Expected conversions field block was not found.')
+          text = text.replace(old_html, new_html, 1)
+
+          old_refs = "const facebookSpend=document.getElementById('facebookSpend'),catholicAdNetSpend=document.getElementById('catholicAdNetSpend'),baseConv=document.getElementById('baseConv'),spendLift=document.getElementById('spendLift'),convLift=document.getElementById('convLift'),spendOut=document.getElementById('spendOut'),convOut=document.getElementById('convOut'),baseCPA=document.getElementById('baseCPA'),newCPA=document.getElementById('newCPA'),change=document.getElementById('change'),formula=document.getElementById('formula');"
+          new_refs = "const facebookSpend=document.getElementById('facebookSpend'),catholicAdNetSpend=document.getElementById('catholicAdNetSpend'),baseConv=document.getElementById('baseConv'),integratedConv=document.getElementById('integratedConv'),spendLift=document.getElementById('spendLift'),convLift=document.getElementById('convLift'),spendOut=document.getElementById('spendOut'),convOut=document.getElementById('convOut'),baseCPA=document.getElementById('baseCPA'),newCPA=document.getElementById('newCPA'),change=document.getElementById('change'),formula=document.getElementById('formula');"
+          if old_refs not in text:
+              raise SystemExit('Expected simulator element references were not found.')
+          text = text.replace(old_refs, new_refs, 1)
+
+          old_calc = "const canSpend=facebook*(sl/100),totalSpend=facebook+canSpend,old=facebook/conv,newConv=conv*(1+cl/100),now=totalSpend/newConv,delta=(now/old-1)*100;catholicAdNetSpend.value=Math.round(canSpend);baseCPA.textContent='$'+old.toFixed(2);"
+          new_calc = "const canSpend=facebook*(sl/100),totalSpend=facebook+canSpend,old=facebook/conv,newConv=conv*(1+cl/100),now=totalSpend/newConv,delta=(now/old-1)*100;catholicAdNetSpend.value=Math.round(canSpend);integratedConv.value=Math.round(newConv);baseCPA.textContent='$'+old.toFixed(2);"
+          if old_calc not in text:
+              raise SystemExit('Expected calculator assignment block was not found.')
+          text = text.replace(old_calc, new_calc, 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit report update
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/multichannelreport.html
+          git commit -m "Add calculated integrated conversions to CPA simulator"
+          git push
